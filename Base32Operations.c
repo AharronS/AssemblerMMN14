@@ -46,8 +46,10 @@ void FromDecimalNumberToBase32(int num, char* outputBase32)
 
 char *DecimalNumberToBase32(int num)
 {
+	int length;
 	char outputBase32[MAX_SIZE_MEMORY_WORDS] = "";
 	SubRoutineFromDecimalNumberToBase32(num, outputBase32);
+	
 	return outputBase32;
 }
 
@@ -158,30 +160,38 @@ void FillAnotherMachineCodeWord(commandMachineCodeWord* commandWords, char *op, 
 			SetMachineCodeWord(&((*commandWords).lines[line]), C_FILL_WITH_OP, buffer);
 		}
 		break;
-	case RANDOM1:
-		randomNumber = rand() % 7; //(AS): random number between 1-7
-		strcpy(buffer, FromDecimalToBinary(randomNumber, 6));
-		SetMachineCodeWord(&((*commandWords).lines[line]), C_FILL_REG_SRC, buffer);
-		strcpy(buffer, FromDecimalToBinary(1, 2));
-		SetMachineCodeWord(&((*commandWords).lines[0]), C_RND, buffer);
-		break;
-	case RANDOM2:
-		randomNumber = rand() % 8180 + (-4090); //(AS): signed number 2^13 (13 bit) size
-		strcpy(buffer, FromDecimalToBinary(num, 13));
-		SetMachineCodeWord(&((*commandWords).lines[line]), C_FILL_WITH_OP, buffer);
-		strcpy(buffer, FromDecimalToBinary(2, 2));
-		SetMachineCodeWord(&((*commandWords).lines[0]), C_RND, buffer);
-		break;
-	case RANDOM3:
-		strcpy(buffer, FromDecimalToBinary(getRandomLabelAddress(), 13));
-		SetMachineCodeWord(&((*commandWords).lines[line]), C_FILL_WITH_OP, buffer);
-		strcpy(buffer, FromDecimalToBinary(2, 2));
-		SetMachineCodeWord(&((*commandWords).lines[line]), C_CODING, buffer);
-		strcpy(buffer, FromDecimalToBinary(2, 2));
-		SetMachineCodeWord(&((*commandWords).lines[0]), C_RND, buffer);
-		break;
+	case RANDOM:
+		if (CheckRandomType(op) == RANDOM1)
+		{
+			randomNumber = rand() % 7; //(AS): random number between 1-7
+			strcpy(buffer, FromDecimalToBinary(randomNumber, 6));
+			SetMachineCodeWord(&((*commandWords).lines[line]), C_FILL_REG_SRC, buffer);
+			strcpy(buffer, FromDecimalToBinary(1, 2));
+			SetMachineCodeWord(&((*commandWords).lines[0]), C_RND, buffer);
+		}
+
+		else if (CheckRandomType(op) == RANDOM2)
+		{
+			randomNumber = rand() % 8180 + (-4090); //(AS): signed number 2^13 (13 bit) size
+			strcpy(buffer, FromDecimalToBinary(num, 13));
+			SetMachineCodeWord(&((*commandWords).lines[line]), C_FILL_WITH_OP, buffer);
+			strcpy(buffer, FromDecimalToBinary(2, 2));
+			SetMachineCodeWord(&((*commandWords).lines[0]), C_RND, buffer);
+
+		}
+
+		else if (CheckRandomType(op) == RANDOM3)
+		{
+			strcpy(buffer, FromDecimalToBinary(getRandomLabelAddress(), 13));
+			SetMachineCodeWord(&((*commandWords).lines[line]), C_FILL_WITH_OP, buffer);
+			strcpy(buffer, FromDecimalToBinary(2, 2));
+			SetMachineCodeWord(&((*commandWords).lines[line]), C_CODING, buffer);
+			strcpy(buffer, FromDecimalToBinary(2, 2));
+			SetMachineCodeWord(&((*commandWords).lines[0]), C_RND, buffer);
+		}
+
 	case DIRECTREG:
-		strncpy(buffer, (*commandWords).lines[line].line + 1, 6);
+		strncpy(buffer, (*commandWords).lines[line].line + 1, 7);
 		if (atoi(buffer) == 0) //(AS): if there isnt data in source reg, fill the src
 		{
 			strcpy(buffer, FromDecimalToBinary(GetNumberOfRegister(op), 6));
@@ -206,7 +216,7 @@ unsigned int GetNumberOfRegister(char *op)
 	{
 		if (!isdigit(tempOp[i]))
 		{
-			tempOp[i] = " ";
+			tempOp[i] = ' ';
 		}
 	}
 	

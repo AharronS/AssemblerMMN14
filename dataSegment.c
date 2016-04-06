@@ -56,7 +56,7 @@ void printData(FILE *fp)
 	dataPtr temp = start;
 	while(temp!=NULL)
 	{
-		fputs(temp->data,fp);
+		fputs(temp->data, fp);
 		temp=temp->next;
 	}
 }

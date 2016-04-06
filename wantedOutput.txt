@@ -1,6 +1,6 @@
 Base 32 Address		Base 32 machine code
 
-		F	5
+	F	5   
 34		1E4
 35		0EQ
 36		614
@@ -16,8 +16,8 @@ Base 32 Address		Base 32 machine code
 3G		27S
 3H		08G
 3I		0U0
-3J		31
-3K		32
+3J		031
+3K		032
 3L		000
-3M		2
-3N		7
+3M		002
+3N		007

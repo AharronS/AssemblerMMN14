@@ -183,8 +183,7 @@ int main(int argc, char *argv[])
 		if (DC>0)
 			newDataSegment();
 		
-		/*read again, now for the second pass:*/
-		//(AS): second pass
+		//(AS): second pass on the file;
 		while(!feof(src)) {
 			if(fgets(str, MAXLINELENGTH-3, src))	/*read strings*/
 			{
@@ -283,7 +282,7 @@ int parser(char line[],char (*rettag)[],int (*retInstrcode)[],char (*retop1)[],c
 	int tagChecked = FALSE;
 	
 	strcpy(lineCopy,line);
-	removeSpaces(&lineCopy, line);
+	removeSpaces(&lineCopy, line, strlen(line));
 	strcpy(line,lineCopy);
 
 	if(FINALDEBUGMODE) printf("parser gets:%s\n",line);

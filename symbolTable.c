@@ -253,7 +253,8 @@ int update(int icVal, int dcVal,FILE *obj)	/*when first pass finished, we need t
 	}
 	//TODO:(AS): here we need to change the header in file.
 	fputs("Base 32 Address\t\tBase 32 machine code\n\n",obj);
-	fprintf(obj,"\t\t%s   %s\n",DecimalNumberToBase32(icVal),DecimalNumberToBase32(dcVal));
+	fprintf(obj, "\t\t%s", DecimalNumberToBase32((icVal - COUNTERSTARTLINE)));
+	fprintf(obj, "\t%s\n", DecimalNumberToBase32(dcVal));
 	return SUCCESS;
 }
 

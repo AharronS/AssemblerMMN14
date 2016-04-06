@@ -1,0 +1,27 @@
+﻿Build started 4/6/2016 6:07:50 PM.
+     1>Project "C:\Git\AssemblerMMN14\AssemblyMMN14.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CRT_SECURE_NO_WARNINGS /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TC /analyze- /errorReport:prompt secondPass.c
+         secondPass.c
+     1>c:\git\assemblermmn14\secondpass.c(139): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[15]'
+     1>c:\git\assemblermmn14\secondpass.c(139): warning C4024: 'ConvertMachineCodeRowToBase32': different types for formal and actual parameter 1
+     1>c:\git\assemblermmn14\secondpass.c(149): warning C4133: 'function': incompatible types - from 'commandMachineCodeWord *' to 'MachineCodeWord *'
+     1>c:\git\assemblermmn14\secondpass.c(148): warning C4101: 'tempNum': unreferenced local variable
+     1>c:\git\assemblermmn14\secondpass.c(291): warning C4048: different array subscripts: 'char (*)[0]' and 'char (*)[80]'
+     1>c:\git\assemblermmn14\secondpass.c(294): warning C4048: different array subscripts: 'char (*)[0]' and 'char (*)[80]'
+     1>c:\git\assemblermmn14\secondpass.c(339): warning C4047: '==': 'char *' differs in levels of indirection from 'int'
+     1>c:\git\assemblermmn14\secondpass.c(458): warning C4048: different array subscripts: 'char (*)[0]' and 'char (*)[180]'
+     1>c:\git\assemblermmn14\secondpass.c(421): warning C4101: 'command': unreferenced local variable
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Git\AssemblerMMN14\Debug\AssemblyMMN14.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Git\AssemblerMMN14\Debug\AssemblyMMN14.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Git\AssemblerMMN14\Debug\AssemblyMMN14.lib" /MACHINE:X86 Debug\Base32Operations.obj
+         Debug\dataSegment.obj
+         Debug\firstPass.obj
+         Debug\parser.obj
+         Debug\secondPass.obj
+         Debug\symbolTable.obj
+         AssemblyMMN14.vcxproj -> C:\Git\AssemblerMMN14\Debug\AssemblyMMN14.exe
+     1>Done Building Project "C:\Git\AssemblerMMN14\AssemblyMMN14.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.62

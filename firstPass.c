@@ -11,8 +11,6 @@
 
 static int fullTableWarningPrinted = NO;
 
-
-
 /*
 instruction type = data\command\string\extern\entry\error (invalid tag or illegal command or anything else?)
 op1,op2 = opernads. in case of a command - operands 1,2. any oher case - 
@@ -110,7 +108,12 @@ int getAddressForm(char *op) /*assuming clean input (no spaces and stuff)*/
 	//(AS): replaced by the RELATIONAL statment
 	else if (*op == '*')
 	{	
-		return CheckRandomType(op);
+		if (CheckRandomType(op) == BADADDRESSFORM)
+		{
+			return BADADDRESSFORM;
+		}
+			
+		return RANDOM;
 	} 
 	
 
@@ -237,7 +240,7 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 					
 					op1address = getAddressForm(op1);
 
-					if (op1address >= RANDOM1 && op1address <= RANDOM3)
+					if (op1address == RANDOM)
 						return BADADDRESSFORM;
 					lines++;
 					

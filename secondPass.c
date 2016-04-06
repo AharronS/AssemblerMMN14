@@ -54,20 +54,21 @@ unsigned int GetGroupCode(int opcode)
 	return 0;
 }
 
-//TODO:(AS): Need to check out what the problem with the new line and fix it
-void removeSpaces(char (*res)[], char* stringIn)
+//(AS): This function removing space from the beginning of the line and the end of the line
+void removeSpaces(char(*res)[], char* stringIn, int stringLength)
 {
-	char *start;
-	while (isspace(*stringIn)) /*delete spaces from the start*/
-		stringIn++;
-	start = stringIn;
-	while (*stringIn!='\0')
-		stringIn++;
-	stringIn--;
-	while (isspace(*stringIn)) /*delete spaces from the end*/
-		stringIn--;
-	*(stringIn+1)='\0';
-	strcpy(*res,start);
+	char lineCopy[MAXLINELENGTH];
+	char *end = &stringIn[stringLength], *start = stringIn;
+
+	while (isspace(*start)) /*delete spaces from the start*/
+		start++;
+
+	while (isspace(*end)) /*delete spaces from the end*/
+		end--;
+
+	strncpy(lineCopy, start, end - start);
+	lineCopy[end - start] = '\0';
+	strcpy(*res, lineCopy);
 }
 
 void getOpWord(char (*dest)[],char op[], int opAddressForm, FILE *ext)
@@ -133,7 +134,7 @@ void WriteToFileCommandMachineWord(commandMachineCodeWord *wordCommand, FILE *fp
 	int i, lines = wordCommand->linesCount;
 	char buffer[MAXLINELENGTH] = "";
 
-	for (i = 0; i < lines; i++)
+	for (i = 0; i <= lines; i++)
 	{
 		ConvertMachineCodeRowToBase32(&((*wordCommand).lines[i].line), buffer);
 		fprintf(fp, "%s\t\t%s\n", DecimalNumberToBase32(rowNum + i), buffer);
@@ -165,17 +166,28 @@ commandMachineCodeWord ConvertCommand(char *op1, char *op2, int opcode, FILE *ex
 		rowNum++;
 		break;
 	case 2:
-		tempNum = (getAddressForm(op1) >= RANDOM1 && getAddressForm(op1) <= RANDOM3) ? 2 : getAddressForm(op1);
-		strcpy(buffer, FromDecimalToBinary(tempNum, 2));
+		strcpy(buffer, FromDecimalToBinary(getAddressForm(op1), 2));
 		SetMachineCodeWord(&(newWordcommand.lines[0]), C_ADDRESS_SRC, buffer);
 		strcpy(buffer, FromDecimalToBinary(getAddressForm(op2), 2));
 		SetMachineCodeWord(&(newWordcommand.lines[0]), C_ADDRESS_DST, buffer);
 		
-		AddAnotherMachineCodeWord(&newWordcommand);
-		FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum);
-		AddAnotherMachineCodeWord(&newWordcommand);
-		FillAnotherMachineCodeWord(&newWordcommand, op2, GetGroupCode(opcode), ext, errorFile, rowNum);
-		rowNum += 2;
+		//(AS): Add two machine code words if and only if both operands are not direct registers
+		if (!(getAddressForm(op1) == DIRECTREG && getAddressForm(op2) == DIRECTREG)) 
+		{
+			AddAnotherMachineCodeWord(&newWordcommand);
+			FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum);
+			AddAnotherMachineCodeWord(&newWordcommand);
+			FillAnotherMachineCodeWord(&newWordcommand, op2, GetGroupCode(opcode), ext, errorFile, rowNum);
+			rowNum += 2;
+		}
+		//(AS): Add one machine code word if and only if both operands are direct registers 
+		else
+		{
+			AddAnotherMachineCodeWord(&newWordcommand);
+			FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum);
+			FillAnotherMachineCodeWord(&newWordcommand, op2, GetGroupCode(opcode), ext, errorFile, rowNum);
+			rowNum ++;
+		}
 		break;
 
 	}
@@ -410,9 +422,9 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 	char *temp = NULL;
 	char op[MAXLINELENGTH], buffer[MAXLINELENGTH + 100]; /*buffer large enough to hold error messages*/
 	char tempBuf[MAXLINELENGTH];
-	int num, i, length;
+	int num, i, length, prevRowNum;
 
-	switch (instructionType)
+ 	switch (instructionType)
 	{
 	case DATA:
 		if (DEBUGMODE)
@@ -443,7 +455,7 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
  		temp = strtok(op, ",");
 		while (temp != NULL)
 		{
-			removeSpaces(&buffer, temp);
+			removeSpaces(&buffer, temp, strlen(temp));
 			if (buffer[0] == '\0')
 			{
 				//sprintf(buffer, "%s\t\tError: Spaces alone are not allowed between commas!\n", DecimalNumberToBase32(dataRowNum));
@@ -454,14 +466,16 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 			{
 				if (1 == sscanf(buffer, "%d%s", &num, tempBuf)) /*buffer contains a number only*/
 				{
-					num &= 0xffff; /*truncate num to a 16 bit number*/
-					//TODO:(AS): check this statement
-
-					sprintf(buffer, "%s\t\t%.6o\n", DecimalNumberToBase32(dataRowNum), DecimalNumberToBase32(num));
+					num = num & 0xffff; /*truncate num to a 16 bit number*/
+					strcpy(buffer, DecimalNumberToBase32(dataRowNum));
+					strcat(buffer, "\t\t");
+					strcat(buffer, DecimalNumberToBase32(num));
+					strcat(buffer, "\n");
 					addData(buffer);
 				}
 				else
 				{
+					//TODO: (AS): handle it with errror handler
 					sprintf(buffer, "%s\t\tError: Only numbers are allowed between commas!\n", DecimalNumberToBase32(dataRowNum));
 					addData(buffer);
 				}
@@ -506,8 +520,9 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 			printf("address is ok\n");
 
 		/*else: result == SUCCESS (address form is legal)*/
+		prevRowNum = rowNum;
 		machineCommand = ConvertCommand(op1, op2, opcode, ext, errorFile);
-		WriteToFileCommandMachineWord(&machineCommand, fp, rowNum);
+		WriteToFileCommandMachineWord(&machineCommand, fp, prevRowNum);
 		return SUCCESS;
 
 		break;
@@ -536,6 +551,7 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 		length = stringLength(op1);
 		if (length<1) /*bad string (doesn't start or end with a " )*/
 		{
+			//TODO:(AS): change to error file handler
 			fprintf(fp, "%o\t\tError: String %s doesn't start or end with a \" !\n", rowNum, op1);
 			rowNum++;
 			return SUCCESS;
@@ -548,12 +564,15 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 			op1++; /*skip the first " */
 			for (i = 0;i<length - 1;i++)
 			{
-				sprintf(buffer, "%o\t\t%.6o\n", dataRowNum, *(op1 + i));
+				strcpy(buffer, DecimalNumberToBase32(dataRowNum));
+				strcat(buffer, "\t\t");
+				strcat(buffer, DecimalNumberToBase32(*(op1 + i)));
+				strcat(buffer, "\n");
 				dataRowNum++;
 				addData(buffer);
 			}
 			/*add the last \0 null value to the string:*/
-			sprintf(buffer, "%o\t\t%.6o\n", dataRowNum, 0);
+			sprintf(buffer, "%s\t\t%s\n", DecimalNumberToBase32(dataRowNum), "000");
 			dataRowNum++;
 			addData(buffer);
 		}

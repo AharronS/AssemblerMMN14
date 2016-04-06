@@ -5,7 +5,7 @@
 #include <stdlib.h> /*for malloc()*/
 #include <stdio.h>  /*for FILE */
 #include <ctype.h>  /*for isDigit,isSpace*/
-//#include "Base32Operations.h"
+
 
 #define MAXSYMBOLS 1000 /*specs page 49, possible to use arrays*/
 #define MAX_SIZE_MEMORY_WORDS 1000
@@ -51,8 +51,9 @@ typedef struct {
 
 char duplicatedTags[MAXSYMBOLS][MAXTAGLENGTH];
 
-enum	{IMMEDIATE = 0, DIRECT, RANDOM1, RANDOM2, RANDOM3,  
-			DIRECTREG, BADADDRESSFORM, NULLOPERANDS} addressForm_e;
+enum	{IMMEDIATE = 0, DIRECT, RANDOM, DIRECTREG, BADADDRESSFORM, NULLOPERANDS} addressForm_e;
+
+enum {RANDOM1 = 1000, RANDOM2, RANDOM3} randomTypes_e;
 
 enum { MOV = 0, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP } commands_e;
 
@@ -70,12 +71,13 @@ int getAddressForm(char *op);
 int checkCommandAddressForm(char *op1, char *op2, int opcode);
 int getCommandLineLength(char *op1, char *op2, int opcode);
 int firstPass(char *tag, int instructionType, int opcode, char *op1, char *op2);
+int CheckRandomType(char *op);
 
 /*in secondPass:*/
 void renewDataRowNum(int icVal);
 void setRowNum(int);
 void setDataRowNum(int);
-void removeSpaces(char (*res)[], char* stringIn);
+void removeSpaces(char(*res)[], char* stringIn, int stringLength);
 void getOpWord(char (*dest)[],char op[], int opAddressForm, FILE *ext);
 void getCommand(char (*dest)[],char *op1, char *op2, int opcode, FILE *ext);
 int commandAddressFormIsLegal(char *op1, char *op2, int opcode);
