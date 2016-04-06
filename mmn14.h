@@ -7,6 +7,7 @@
 #define MAXTAGLENGTH 30
 #define MAXLINELENGTH 80
 #define COUNTERSTARTLINE 0
+#define MAX_SIZE_OF_RANDOM_PREFIX_COMMAND 4
 
 enum {NO,YES};
 enum {DATA,STRING,EXTERN,ENTRY,COMMAND,ERROR} lineType_e;
@@ -29,10 +30,12 @@ typedef struct {
 
 char duplicatedTags[MAXSYMBOLS][MAXTAGLENGTH];
 
-enum	{IMMEDIATE = 0, DIRECT = 1, RELATIONAL = 3,
-		 DIRECTREG = 4, BADADDRESSFORM = 5, NULLOPERANDS = 6} addressForm_e;
-enum {MOV,CMP,ADD,SUB,ROR,SHR,LEA,INC,DEC,JMP,BNE,RED,PRN,JSR,RTS,HLT} commands_e;
+enum	{IMMEDIATE = 0, DIRECT, RANDOM1, RANDOM2, RANDOM3, RELATIONAL, //TODO:(AS): remove this! 
+			DIRECTREG, BADADDRESSFORM, NULLOPERANDS} addressForm_e;
 
+enum {MOV,CMP,ADD,SUB,ROR,SHR,LEA,INC,DEC,JMP,BNE,RED,PRN,JSR,RTS,HLT} commands_e;
+//TODO:(AS): need to replace this enum :
+//TODO:(AS): enum {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP} commands_e;
 /*******read description of each function in the source file***********/
 
 /*in firstPass:*/

@@ -5,15 +5,17 @@
 #define ILLEGAL -1						/*returned when illegal value is detected*/
 #define TRUE 1							/*Together with FALSE, used for the makeshift boolean*/
 #define FALSE 0							/*Together with TRUE, used for the makeshift boolean*/
-#define DEBUGMODE FALSE 				/*debugging mode. enable for most verbose mode*/
-#define DEBUMGMODETIER2 FALSE			/*second most verbose debug mode*/
-#define FINALDEBUGMODE FALSE			/*minimal output for debugging*/
+//TODO:(AS): remove all debuging constant and debuging statement
+#define DEBUGMODE TRUE 				/*debugging mode. enable for most verbose mode*/
+#define DEBUMGMODETIER2 TRUE			/*second most verbose debug mode*/
+#define FINALDEBUGMODE TRUE			/*minimal output for debugging*/
 #define FILENAMELENGTH 50				/*file name length*/
-
+//TODO:(AS):change the NUMBEROFLEGALINSTR
+//TODO:(AS):#define NUMBEROFLEGALINSTR 14
 #define NUMBEROFLEGALINSTR 16	/*number of legal instructions*/
 
 
-/*
+/*	
  * Definitions:
  * each file contains lines, grabbed by fileReader() and passed to the parser().
  * each line, is dissected by parser() into a command, and it's parts are sent for checking.
@@ -49,7 +51,8 @@ int main(int argc, char *argv[])
 
 	if(DEBUGMODE) printf("input file1 name: %s\n",argv[1]);
 
-	for (fileIndex=1;fileIndex<argc;fileIndex++)	/*for each file in argv, do:*/
+
+	for (fileIndex = 1; fileIndex < argc; fileIndex++)	/*for each file in argv, do:*/
 	{
 		entries   = NULL;
 		externals = NULL;
@@ -79,6 +82,7 @@ int main(int argc, char *argv[])
 			printf("Cannot open object file!\n");
 			exit(1);
 		}
+		
 		init(); /*initialize symbol table*/
 		
 		/*reads the file into a string, calls the parser for each line  */
@@ -107,7 +111,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				else
-				{
+				{	
 
 					interCompilerCommand=parser(str,&tag,&instropcode,&op1,&op2);
 
@@ -313,7 +317,7 @@ int parser(char line[],char (*rettag)[],int (*retInstrcode)[],char (*retop1)[],c
 		return(STRING);
 	}
 
-
+	//TODO:(AS): check for stop
 	if (strlen(line)<3) /*not empty, yet too short for legal command. shortest commands are hlt or rts without tag.*/
 	{
 			if(DEBUGMODE) printf("%s reports: Error: too short for legal command\n",__FUNCTION__);
@@ -529,7 +533,7 @@ int CompilerInstrChecker(char* instr)
 /*checks if given instruction is valid(legal):
  * 1. it should be one of the 15 authorized commands (see spec.pg19-20) or a compiler instruction
  * 1. right number of operands for instruction
- * no operand instructions: rts, hlt
+ * no operand instructions: rts, hlt //TODO:(AS):Change to stop
  * one operand instructions: inc, dec, jmp, bne, red, prn, jsr
  * two operand instructions: mov,cmp, add, sub, ror, shr, lea,
  * compiler instructions: ".data",".entry",".extern",".string" (all without the ")
@@ -547,7 +551,9 @@ int InstructionChecker(char* instr,char* op1, char* op2,char (*retstr)[])
 {
 	if(DEBUGMODE) printf("%s\n",__FUNCTION__);
 	if(DEBUGMODE) printf("Args: %s %s %s\n",instr,op1,op2);
-
+	//TODO:(AS): I added our instructions(not, clr), need to remove irelevant instructions
+	//TODO:(AS): replace hlt by stop,  remove "ror" and "shr", keep the order of commands! important!
+	/*const char *legalInstr[] = { "mov","cmp", "add", "sub", "lea", "not", "clr", "inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "stop" }; /*the legal instructions*/
 	const char *legalInstr[] =	{"mov","cmp", "add", "sub", "ror", "shr", "lea","inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "hlt"}; /*the legal instructions*/
 	int retCompilerInstrChecker=FALSE;		/*return value for compilerinstructionChecker*/
 	int	flagFoundLegalInstruction=0;		/*flag for the stoppingthe loop going through the array of commands if a legal instruction was found.*/
@@ -590,6 +596,7 @@ int InstructionChecker(char* instr,char* op1, char* op2,char (*retstr)[])
 	{
 		if(DEBUMGMODETIER2)printf("%s says: found legal instruction\n",__FUNCTION__);
 		/*found legal instruction, now checking that it's operands match*/
+		//TODO:(AS): Make sure the changes do not violate the order of commands, and the compatibility of the commands required number of operands 
 		if(instrNumber>=14) /*no operand instr*/
 		{
 			OperandNumChecker(0,op1,op2,&OperandnumRet_s);
@@ -661,7 +668,10 @@ void TagChecker(char* partstr,char (*strret)[])
 {
 	if(DEBUGMODE){ printf(__FUNCTION__);printf("\n");}
 	if(DEBUGMODE) printf("Args: %s\n",partstr);
-
+	//TODO:(AS): need to replace these commands by
+	/*TODO:(AS): 
+	const char* commands[] =	{"mov","cmp", "add", "sub", "not", "clr", "lea","inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "stop"};
+	*/
 	const char* commands[] =	{"mov","cmp", "add", "sub", "ror", "shr", "lea","inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "hlt"};
 	const int NUMBEROFCOMMANDS=16; /*the number of legal command, represented in the array commands[].*/
 	const char* registers[] = {"r0","r1","r2","r3","r4","r5","r6","r7"};/*array of the register names*/

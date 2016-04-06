@@ -1,5 +1,5 @@
 #include "mmn14.h"
-#define DEBUGMODE 0
+#define DEBUGMODE 1
 #define EMPTYTAG ""
 
 
@@ -74,7 +74,7 @@ void addDuplicatedSymbol(char *tag)
 }
 
 void init()
-{
+ {
 	int i;
 	symbolRow temp;
 	temp.address = temp.isTemp = temp.isExtern = temp.associatedTo = temp.commandLength = 0;

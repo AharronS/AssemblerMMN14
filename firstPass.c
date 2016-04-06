@@ -1,5 +1,5 @@
 #include "mmn14.h"
-#define DEBUGMODE 0
+#define DEBUGMODE 1
 #define printWarning();\
 {\
 	printf("ATTENTION: DURING THE FIRST PASS, A FUNCTION REPORTED THAT -\n");\
@@ -37,6 +37,26 @@ void updateDC(int updateVal)	/*called in case of a legal (data) line turned out 
 	DC-=updateVal;
 }
 
+int CheckRandomType(char *op)
+{
+	char tempRandomType[MAX_SIZE_OF_RANDOM_PREFIX_COMMAND];
+
+	strncpy(tempRandomType, op, 3);
+	if (strcmp("***", tempRandomType) == 0)
+	{
+		return RANDOM3;
+	}
+
+	else if (strcmp("**", tempRandomType) == 0)
+	{
+		return RANDOM2;
+	}
+	else if (strcmp("*", tempRandomType) == 0)
+	{
+		return RANDOM1;
+	}
+	return BADADDRESSFORM;
+}
 
 /*get counters: interface for other files*/
 int getIC()
@@ -89,8 +109,18 @@ int getAddressForm(char *op) /*assuming clean input (no spaces and stuff)*/
 	else if (*op == '*')
 	{	/*if the tag is illegal, then an error will be printed later*/
 		/*anything after the '*' is the tag as much as we care here*/
+		//TODO:(AS): need to change to random, acording to the definition
 		return RELATIONAL;
 	}
+	
+	/*
+	//TODO:(AS): replace this statment
+	else if (*op == '*')
+	{	
+		return CheckRandomType(op);
+	} 
+	*/
+
 	else if (*op == 'r')
 	{
 		op++;
@@ -114,8 +144,9 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 		case MOV:
 		case ADD:
 		case SUB:
-		case ROR:
-		case SHR:
+		case ROR: //TODO:(AS): remove this
+		case SHR: //TODO:(AS): remove this
+			//TODO:(AS): lines = 3;
 					if (op1==NULL || op2==NULL || *op1=='\0' || *op2=='\0')
 						return NULLOPERANDS;
 					op2address = getAddressForm(op2);
@@ -125,21 +156,35 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 						
 					op1address = getAddressForm(op1);
 					
-					if (op1address != DIRECTREG)
+					if (op1address != DIRECTREG)  //TODO:(AS): need to chage this, because there is at least one additional word memory
+						//TODO:(AS): we need to init this with 2, only stop and rts get one word memory
 						lines++;
-					if (op2address != DIRECTREG)
+					if (op2address != DIRECTREG) 
+						/*
+						TODO:(AS): change this if statment.
+						if(op1address == DIRECTREG && op2address == DIRECTREG)
+							lines--;
+						*/
 						lines++;
 					
 					break;
 
 		case CMP:
+					//TODO:(AS): lines = 3;
 					if (op1==NULL || op2==NULL || *op1=='\0' || *op2=='\0')
 						return NULLOPERANDS;
 					op1address = getAddressForm(op1);
 					op2address = getAddressForm(op2);
 					if (op1address != DIRECTREG)
+						//TODO:(AS): need to chage this, because there is at least one additional word memory
+						//TODO:(AS): we need to init this with 2, only stop and rts get one word memory
 						lines++;
 					if (op2address != DIRECTREG)
+						/*
+						TODO:(AS): change this if statment.
+						if(op1address == DIRECTREG && op2address == DIRECTREG)
+						lines--;
+						*/
 						lines++;
 					
 					break;
@@ -149,11 +194,15 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 						return NULLOPERANDS;
 					op1address = getAddressForm(op1);
 					op2address = getAddressForm(op2);
-					if (op1address != DIRECT || op2address == IMMEDIATE)
+					if (op1address != DIRECT || op2address == IMMEDIATE) 
+						/*TODO:(AS): only direct, or random with ***
+						if (!(op1address == DIRECT || op1 == RAND(***))
+						*/
 						return BADADDRESSFORM;
 					
 					/*op1 needs 1 word at least. (addressing\mapping form 1, direct)*/
 					/*op2 may vary. Therefore, check it:*/
+					//TODO:(AS): There is no chance that the command does not use 3 words, need to remove this statment
 					if (op2address != DIRECTREG)
 						lines+=2;
 					else
@@ -162,8 +211,14 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 					break;
 
 		case INC:
+		/*
+		TODO:(AS): add this:
+		case NOT:
+		case CLR:
+		*/
 		case DEC:
 		case RED:
+					
 					/*op1 should be NULL (see table on specs. page 31)*/
 					if (DEBUGMODE && (op2 != NULL || *op2 != '\0'))
 					{
@@ -176,8 +231,11 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 					op1address = getAddressForm(op1);
 					
 					if (op1address == IMMEDIATE)
+						/*TODO:(AS): change this statment to 
+						if (op1address == IMMEDIATE || op1address == RAND)
+						*/
 						return BADADDRESSFORM;
-					if (op1address != DIRECTREG)
+					if (op1address != DIRECTREG)//TODO:(AS): remove the statment, remain the line++;
 						lines++;
 						
 					break;
@@ -215,13 +273,21 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 						return NULLOPERANDS;
 					
 					op1address = getAddressForm(op1);
-					
-					if (op1address != DIRECTREG)
+					/*
+					TODO:(AS):
+					if (op1address == RAND)
+						return BADADDRESSFORM;
+					*/
+					if (op1address != DIRECTREG) 
+						/*
+						TODO:(AS): remove this statment
+						*/
 						lines++;
 					
 					break;
 
 		case RTS:
+		//TODO:(AS): Change to STOP
 		case HLT:
 					if (DEBUGMODE && (op1 != NULL || *op1 != '\0') && (op2 != NULL || *op2 != '\0'))
 					{
@@ -292,6 +358,7 @@ int firstPass(char *tag, int instructionType, int opcode, char *op1, char *op2)
 						result = addSymbol(tag,COMMAND,IC);
 					if (result == SUCCESS)
 					{
+						//TODO:(AS): need to change this(add relevant bytes to the IC) function acroding our project
 						length=getCommandLineLength(op1,op2,opcode);
 						IC+=length;
 						if (tag!=NULL)
@@ -371,7 +438,7 @@ int firstPass(char *tag, int instructionType, int opcode, char *op1, char *op2)
 		case ENTRY:
 					/*DO NOTHING. Entry type is needed for the second pass only*/
 					if (DEBUGMODE)
-						printf("entry.\n");
+							printf("entry.\n");
 					return SUCCESS;
 					
 					break;

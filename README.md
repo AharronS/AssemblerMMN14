@@ -1,2 +1,0 @@
-# AssemblerMMN14
-Assembler

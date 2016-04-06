@@ -1,6 +1,11 @@
 #include "mmn14.h"
-#define DEBUGMODE 0
+#define DEBUGMODE 1
 
+//TODO:(AS): change these commands by:
+/*TODO:(AS): const char* commands[] =	{"mov","cmp", "add", "sub", "lea",
+							 "not", "clr", "inc", "dec", "jmp",
+							 "bne", "red", "prn", "jsr", "rts", "stop"};
+*/
 const char* commands[] =	{"mov","cmp", "add", "sub", "ror",
 							 "shr", "lea","inc", "dec", "jmp",
 							 "bne", "red", "prn", "jsr","rts", "hlt"};
@@ -24,6 +29,7 @@ void renewDataRowNum(int icVal)
 	dataRowNum+=icVal; /*updates dataRowNum to match the correct row number*/
 }
 
+//TODO:(AS): Need to check out what the problem with the new line and fix it
 void removeSpaces(char (*res)[], char* stringIn)
 {
 	char *start;
