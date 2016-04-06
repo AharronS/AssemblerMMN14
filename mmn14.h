@@ -1,17 +1,38 @@
+#ifndef MMN14_H
+#define MMN14_H
+
 #include <string.h> /*for strcmp(),strcpy()*/
 #include <stdlib.h> /*for malloc()*/
 #include <stdio.h>  /*for FILE */
 #include <ctype.h>  /*for isDigit,isSpace*/
+//#include "Base32Operations.h"
 
 #define MAXSYMBOLS 1000 /*specs page 49, possible to use arrays*/
+#define MAX_SIZE_MEMORY_WORDS 1000
 #define MAXTAGLENGTH 30
 #define MAXLINELENGTH 80
-#define COUNTERSTARTLINE 0
+#define COUNTERSTARTLINE 100
 #define MAX_SIZE_OF_RANDOM_PREFIX_COMMAND 4
+#define BASE_32_ROW_COMMAND 4
+#define MACHINE_CODE_ROW_LENGTH 15
+#define BASE32_SINGLE_NUMBER_LENGTH 5
 
 enum {NO,YES};
 enum {DATA,STRING,EXTERN,ENTRY,COMMAND,ERROR} lineType_e;
 enum {SUCCESS,SYMBOL_EXISTS,FULL_TABLE} error_e;
+
+typedef struct  machineCodeWord {
+	char  line[15];
+} MachineCodeWord;
+
+typedef struct  CommandMachineCode {
+	int linesCount;
+	MachineCodeWord lines[3];
+} commandMachineCodeWord;
+
+
+typedef enum { C_RND = 100, C_GROUP, C_OPCODE, C_ADDRESS_SRC, C_ADDRESS_DST,
+				C_CODING, C_FILL_WITH_OP, C_FILL_REG_DEST, C_FILL_REG_SRC } WordComponent;
 
 typedef struct  st{
         char tag[MAXTAGLENGTH];
@@ -30,12 +51,11 @@ typedef struct {
 
 char duplicatedTags[MAXSYMBOLS][MAXTAGLENGTH];
 
-enum	{IMMEDIATE = 0, DIRECT, RANDOM1, RANDOM2, RANDOM3, RELATIONAL, //TODO:(AS): remove this! 
+enum	{IMMEDIATE = 0, DIRECT, RANDOM1, RANDOM2, RANDOM3,  
 			DIRECTREG, BADADDRESSFORM, NULLOPERANDS} addressForm_e;
 
-enum {MOV,CMP,ADD,SUB,ROR,SHR,LEA,INC,DEC,JMP,BNE,RED,PRN,JSR,RTS,HLT} commands_e;
-//TODO:(AS): need to replace this enum :
-//TODO:(AS): enum {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP} commands_e;
+enum { MOV = 0, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP } commands_e;
+
 /*******read description of each function in the source file***********/
 
 /*in firstPass:*/
@@ -59,7 +79,8 @@ void removeSpaces(char (*res)[], char* stringIn);
 void getOpWord(char (*dest)[],char op[], int opAddressForm, FILE *ext);
 void getCommand(char (*dest)[],char *op1, char *op2, int opcode, FILE *ext);
 int commandAddressFormIsLegal(char *op1, char *op2, int opcode);
-int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2, FILE *fp, FILE *ext);
+int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2, FILE *fp, FILE *ext, FILE *errorFile);
+void WriteToFileCommandMachineWord(commandMachineCodeWord *wordCommand, FILE *fp, int rowNum);
 
 /*in symbolTable:*/
 void printTable();
@@ -86,7 +107,7 @@ void addData(char dataRow[]);
 void deleteDataSegment();
 void printData(FILE *fp);
 
-
+#endif
 
 
 

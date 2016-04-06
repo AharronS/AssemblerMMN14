@@ -1,4 +1,6 @@
 #include "mmn14.h"
+#include "Base32Operations.h"
+
 #define DEBUGMODE 1
 #define EMPTYTAG ""
 
@@ -109,7 +111,7 @@ int addSymbol (char symbol[], int lineType, int counterVal) /*called to update s
 	if (DEBUGMODE)
 	{
 		printf("Symbol table before addSymbol():\n");
-		printTable();
+			printTable();
 	}
 
 	if (symbol != NULL && symbol[0]!='\0')
@@ -207,6 +209,33 @@ symbolRow *getRow(char symbol[])	/*returns a pointer to the desired tag field in
 	return Row;
 }
 
+int getRandomLabelAddress()	
+{
+	int i, randomNumber, address, count = 0;
+	int currentSymb = symbolPtr->currentSymbol;
+	for (i = 0; i < currentSymb; i++)
+	{
+		if (symbolPtr->row[i].isExtern == NO && symbolPtr->row[i].associatedTo == DATA)
+		{
+			count++;
+		}
+	}
+	
+	randomNumber = rand() % count;
+	count = 0;
+
+	for (i = 0; i < currentSymb; i++)
+	{
+		if (symbolPtr->row[i].isExtern == NO && symbolPtr->row[i].associatedTo == DATA)
+		{
+			count++;
+			address = (count == randomNumber) ? symbolPtr->row[i].address : 0;
+		}
+	}
+
+	return address;
+}
+
 int update(int icVal, int dcVal,FILE *obj)	/*when first pass finished, we need to update temporary addresses;*/
 { 											/*temp addresses were the DC values of the labels.*/
 	
@@ -222,10 +251,9 @@ int update(int icVal, int dcVal,FILE *obj)	/*when first pass finished, we need t
 			(symbolPtr->row[i].address)+=icVal;
 		}
 	}
-	fputs("Octal\t\tOctal\t\tAbsolute,\n",obj);
-	fputs("Address\t\tmachine\t\trelocatable\n",obj);
-	fputs("\t\tcode\t\tor external\n\n",obj);
-	fprintf(obj,"\t\t%o   %o\n",icVal,dcVal);
+	//TODO:(AS): here we need to change the header in file.
+	fputs("Base 32 Address\t\tBase 32 machine code\n\n",obj);
+	fprintf(obj,"\t\t%s   %s\n",DecimalNumberToBase32(icVal),DecimalNumberToBase32(dcVal));
 	return SUCCESS;
 }
 

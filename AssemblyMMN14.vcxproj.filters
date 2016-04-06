@@ -30,9 +30,15 @@
     <ClCompile Include="symbolTable.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Base32Operations.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mmn14.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Base32Operations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

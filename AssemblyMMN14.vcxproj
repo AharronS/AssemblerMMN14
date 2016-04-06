@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Base32Operations.c" />
     <ClCompile Include="dataSegment.c" />
     <ClCompile Include="firstPass.c" />
     <ClCompile Include="parser.c" />
@@ -153,6 +154,7 @@
     <ClCompile Include="symbolTable.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Base32Operations.h" />
     <ClInclude Include="mmn14.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

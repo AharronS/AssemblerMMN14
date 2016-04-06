@@ -10,8 +10,6 @@
 #define DEBUMGMODETIER2 TRUE			/*second most verbose debug mode*/
 #define FINALDEBUGMODE TRUE			/*minimal output for debugging*/
 #define FILENAMELENGTH 50				/*file name length*/
-//TODO:(AS):change the NUMBEROFLEGALINSTR
-//TODO:(AS):#define NUMBEROFLEGALINSTR 14
 #define NUMBEROFLEGALINSTR 16	/*number of legal instructions*/
 
 
@@ -36,7 +34,7 @@ int main(int argc, char *argv[])
 	int ExceededLineLengthFlag;		/*flag indicating if last line exceeded the max length permitted*/
 	char fileName[FILENAMELENGTH];
 	char fileNameTemp[FILENAMELENGTH];
-	FILE *src, *entries, *externals, *object;
+	FILE *src, *entries, *externals, *object, *errorFile;
 	int entryFileNeededFlag, externFileNeededFlag;
 	int IC,DC;
 	int fileIndex;
@@ -80,6 +78,13 @@ int main(int argc, char *argv[])
 		object = fopen(fileNameTemp,"w");
 		if(!object){
 			printf("Cannot open object file!\n");
+			exit(1);
+		}
+
+
+		errorFile = fopen("ErrorTempFile", "w");
+		if (!object) {
+			printf("Cannot open critical debug file!\n");
 			exit(1);
 		}
 		
@@ -179,7 +184,7 @@ int main(int argc, char *argv[])
 			newDataSegment();
 		
 		/*read again, now for the second pass:*/
-		
+		//(AS): second pass
 		while(!feof(src)) {
 			if(fgets(str, MAXLINELENGTH-3, src))	/*read strings*/
 			{
@@ -190,7 +195,7 @@ int main(int argc, char *argv[])
 						ExceededLineLengthFlag=TRUE;
 						interCompilerCommand=STRING;
 						strcpy(op1,"Line too long.");
-						secondPass(NULL,ERROR,-1,op1,NULL,object,externals);
+						secondPass(NULL,ERROR,-1,op1,NULL,object,externals, errorFile);
 						if (FINALDEBUGMODE) printf("Main returned Error: line too long.\n");
 					}
 					else
@@ -206,9 +211,9 @@ int main(int argc, char *argv[])
 					interCompilerCommand=parser(str,&tag,&instropcode,&op1,&op2);
 					
 					if (interCompilerCommand == ENTRY)
-						secondPass(tag,ENTRY,-1,op1,op2,entries,externals);
+						secondPass(tag,ENTRY,-1,op1,op2,entries,externals, errorFile);
 					else
-						secondPass(tag,interCompilerCommand,instropcode[0],op1,op2,object,externals);
+						secondPass(tag,interCompilerCommand,instropcode[0],op1,op2,object,externals, errorFile);
 				}
 
 				instropcode[0]=ILLEGAL; /*clean up for next round */
@@ -232,6 +237,8 @@ int main(int argc, char *argv[])
 			fclose(entries);
 		if(externals!=NULL)
 			fclose(externals);
+		if (errorFile != NULL)
+			fclose(errorFile);
 		
 		deleteTable();	/*clear symbol table*/
 		
@@ -533,7 +540,7 @@ int CompilerInstrChecker(char* instr)
 /*checks if given instruction is valid(legal):
  * 1. it should be one of the 15 authorized commands (see spec.pg19-20) or a compiler instruction
  * 1. right number of operands for instruction
- * no operand instructions: rts, hlt //TODO:(AS):Change to stop
+ * no operand instructions: rts, stop 
  * one operand instructions: inc, dec, jmp, bne, red, prn, jsr
  * two operand instructions: mov,cmp, add, sub, ror, shr, lea,
  * compiler instructions: ".data",".entry",".extern",".string" (all without the ")
@@ -551,10 +558,7 @@ int InstructionChecker(char* instr,char* op1, char* op2,char (*retstr)[])
 {
 	if(DEBUGMODE) printf("%s\n",__FUNCTION__);
 	if(DEBUGMODE) printf("Args: %s %s %s\n",instr,op1,op2);
-	//TODO:(AS): I added our instructions(not, clr), need to remove irelevant instructions
-	//TODO:(AS): replace hlt by stop,  remove "ror" and "shr", keep the order of commands! important!
-	/*const char *legalInstr[] = { "mov","cmp", "add", "sub", "lea", "not", "clr", "inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "stop" }; /*the legal instructions*/
-	const char *legalInstr[] =	{"mov","cmp", "add", "sub", "ror", "shr", "lea","inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "hlt"}; /*the legal instructions*/
+	const char *legalInstr[] = { "mov","cmp", "add", "sub", "lea", "not", "clr", "inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "stop" }; /*the legal instructions*/
 	int retCompilerInstrChecker=FALSE;		/*return value for compilerinstructionChecker*/
 	int	flagFoundLegalInstruction=0;		/*flag for the stoppingthe loop going through the array of commands if a legal instruction was found.*/
 	int opcode=ILLEGAL;						/*legal opcodes are 0-15. init to ILLEGAL*/
@@ -668,11 +672,7 @@ void TagChecker(char* partstr,char (*strret)[])
 {
 	if(DEBUGMODE){ printf(__FUNCTION__);printf("\n");}
 	if(DEBUGMODE) printf("Args: %s\n",partstr);
-	//TODO:(AS): need to replace these commands by
-	/*TODO:(AS): 
 	const char* commands[] =	{"mov","cmp", "add", "sub", "not", "clr", "lea","inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "stop"};
-	*/
-	const char* commands[] =	{"mov","cmp", "add", "sub", "ror", "shr", "lea","inc", "dec", "jmp", "bne", "red", "prn", "jsr","rts", "hlt"};
 	const int NUMBEROFCOMMANDS=16; /*the number of legal command, represented in the array commands[].*/
 	const char* registers[] = {"r0","r1","r2","r3","r4","r5","r6","r7"};/*array of the register names*/
 	const int NUMBEROFREGISTERS=8; /*number of legal registers, represented in the array registers[]*/
