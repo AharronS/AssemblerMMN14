@@ -1,0 +1,18 @@
+Octal		Octal		Absolute,
+Address		machine		relocatable
+		code		or external
+
+		15   0
+0		Error: Line too long.
+1		001041		a
+2		000000		e
+3		010041		a
+4		000000		a
+5		110010		a
+6		000014		r
+7		070010		a
+10		000000		e
+11		070041		a
+12		120010		a
+13		000001		r
+14		160000		a
