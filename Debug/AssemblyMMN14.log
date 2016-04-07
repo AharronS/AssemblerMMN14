@@ -1,17 +1,17 @@
-﻿Build started 4/7/2016 10:28:20 AM.
+﻿Build started 4/7/2016 11:22:36 AM.
      1>Project "C:\Git\AssemblerMMN14\AssemblyMMN14.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CRT_SECURE_NO_WARNINGS /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TC /analyze- /errorReport:prompt secondPass.c
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CRT_SECURE_NO_WARNINGS /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TC /analyze- /errorReport:prompt secondPass.c symbolTable.c
+         symbolTable.c
          secondPass.c
-     1>c:\git\assemblermmn14\secondpass.c(139): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[15]'
-     1>c:\git\assemblermmn14\secondpass.c(139): warning C4024: 'ConvertMachineCodeRowToBase32': different types for formal and actual parameter 1
-     1>c:\git\assemblermmn14\secondpass.c(149): warning C4133: 'function': incompatible types - from 'commandMachineCodeWord *' to 'MachineCodeWord *'
-     1>c:\git\assemblermmn14\secondpass.c(148): warning C4101: 'tempNum': unreferenced local variable
-     1>c:\git\assemblermmn14\secondpass.c(295): warning C4048: different array subscripts: 'char (*)[0]' and 'char (*)[80]'
-     1>c:\git\assemblermmn14\secondpass.c(298): warning C4048: different array subscripts: 'char (*)[0]' and 'char (*)[80]'
-     1>c:\git\assemblermmn14\secondpass.c(343): warning C4047: '==': 'char *' differs in levels of indirection from 'int'
-     1>c:\git\assemblermmn14\secondpass.c(462): warning C4048: different array subscripts: 'char (*)[0]' and 'char (*)[180]'
-     1>c:\git\assemblermmn14\secondpass.c(425): warning C4101: 'command': unreferenced local variable
+     1>c:\git\assemblermmn14\secondpass.c(81): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[15]'
+     1>c:\git\assemblermmn14\secondpass.c(81): warning C4024: 'ConvertMachineCodeRowToBase32': different types for formal and actual parameter 1
+     1>c:\git\assemblermmn14\secondpass.c(91): warning C4133: 'function': incompatible types - from 'commandMachineCodeWord *' to 'MachineCodeWord *'
+     1>c:\git\assemblermmn14\secondpass.c(90): warning C4101: 'tempNum': unreferenced local variable
+     1>c:\git\assemblermmn14\secondpass.c(180): warning C4047: '==': 'char *' differs in levels of indirection from 'int'
+     1>c:\git\assemblermmn14\secondpass.c(299): warning C4048: different array subscripts: 'char (*)[0]' and 'char (*)[180]'
+     1>c:\git\assemblermmn14\secondpass.c(262): warning C4101: 'command': unreferenced local variable
+         Generating Code...
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Git\AssemblerMMN14\Debug\AssemblyMMN14.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Git\AssemblerMMN14\Debug\AssemblyMMN14.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Git\AssemblerMMN14\Debug\AssemblyMMN14.lib" /MACHINE:X86 Debug\Base32Operations.obj
          Debug\dataSegment.obj
@@ -24,4 +24,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.52
+Time Elapsed 00:00:00.74

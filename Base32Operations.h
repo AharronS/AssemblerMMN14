@@ -15,8 +15,7 @@ void InitMachineCodeWord(MachineCodeWord* word);
 void FromMachineCodeWordToBase32Word(MachineCodeWord* word, char *base32OutputCommand);
 unsigned int GetNumberOfRegister(char *op);
 void SetMachineCodeWord(MachineCodeWord* word, WordComponent component, char *val);
-void FillAnotherMachineCodeWord(commandMachineCodeWord* commandWords, char *op, int group,
-	FILE *ext, FILE* errorFile, int rowNum);
+void FillAnotherMachineCodeWord(commandMachineCodeWord* commandWords, char *op, int group, FILE *ext, FILE* errorFile, int rowNum);
 void AddAnotherMachineCodeWord(commandMachineCodeWord* commandWords);
 //(AS): this function take string(5 characters) and return decimal number
 int FromBinaryToDecimal(char *stringBinaryNumber);

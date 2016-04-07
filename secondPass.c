@@ -71,64 +71,6 @@ void removeSpaces(char(*res)[], char* stringIn, int stringLength)
 	strcpy(*res, lineCopy);
 }
 
-void getOpWord(char (*dest)[],char op[], int opAddressForm, FILE *ext)
-{
-	char word[MAXLINELENGTH];
-	char buffer[MAXLINELENGTH];
-	int num;
-	char *helper;
-	symbolRow *symbRow;
-	if (opAddressForm == IMMEDIATE)
-	{
-		sscanf(op,"#%d",&num);
-		num&=0xffff; /*make num correspond to a 16-bit machine. (if num is negative - truncate to 16 bit)*/
-		sprintf(word,"%o\t\t%.6o\t\t%c\n",rowNum,num,'a'); /*a = absolute value*/
-	}
-	else if (opAddressForm == RANDOM1) //TODO:(AS): i replaced RATIONAL with RANDOM1, ofcourse we need to replace the logic
-	{
-		helper = &(op[1]); /*op[0] = '*' */
-		strcpy(buffer,helper);
-		symbRow = getRow(buffer); /*get the row with the required tag*/
-		
-		if(DEBUGMODE && (symbRow!=NULL))
-			printf("symbol: tag %s address %d\n",symbRow->tag,symbRow->address);
-		
-		if (symbRow == NULL) /*no such row*/
-			sprintf(word,"%o\t\tError: Tag \"%s\" is not defined!\n",rowNum,buffer);
-		else if (hasADuplicate(buffer))
-			sprintf(word,"%o\t\tError: Tag \"%s\" is defined more than once in the source file!\n",rowNum,buffer);
-		else if (symbRow->isExtern == YES)
-			sprintf(word,"%o\t\tError: Tag \"%s\" cannot be external in relational addressing!\n",rowNum,buffer);
-		else
-			sprintf(word,"%o\t\t%.6o\t\t%c\n",rowNum,(symbRow->address)-rowNum,'a');
-	}
-	else /* opAddressForm == DIRECT*/
-	{
-		symbRow = getRow(op);
-		
-		if(DEBUGMODE && (symbRow != NULL))
-			printf("symbol: tag %s address %d\n",symbRow->tag,symbRow->address);
-		
-		if (symbRow == NULL)
-			sprintf(word,"%o\t\tError: Tag \"%s\" not defined!\n",rowNum,op);
-		else if (hasADuplicate(op))
-			sprintf(word,"%o\t\tError: Tag \"%s\" is defined more than once in the source file!\n",rowNum,op);
-		else if (symbRow->isExtern == YES)
-		{
-			sprintf(word,"%o\t\t%.6o\t\t%c\n",rowNum,symbRow->address,'e'); /*e for external*/
-			fprintf(ext,"%s\t\t%o\n",symbRow->tag,rowNum);
-		}
-		else
-			sprintf(word,"%o\t\t%.6o\t\t%c\n",rowNum,symbRow->address,'r');
-	}
-	rowNum++;
-	
-	if(DEBUGMODE)
-		printf("opWord: op = %s\n\tword = %s\n",op,word);
-	
-	strcpy(*dest,word);
-}
-
 void WriteToFileCommandMachineWord(commandMachineCodeWord *wordCommand, FILE *fp, int rowNum)
 {
 	int i, lines = wordCommand->linesCount;
@@ -199,111 +141,6 @@ commandMachineCodeWord ConvertCommand(char *op1, char *op2, int opcode, FILE *ex
 	rowNum++;
 	return newWordcommand;
 	
-}
-
-void getCommand(char (*dest)[],char *op1, char *op2, int opcode, FILE *ext)
-{
-	char command[MAXLINELENGTH*3]; /*max 3 output rows (output row is smaller than an input line)*/
-	char buffer[MAXLINELENGTH];
-	int op1AddressForm = BADADDRESSFORM, op2AddressForm = BADADDRESSFORM;
-	char op1word[MAXLINELENGTH], op2word[MAXLINELENGTH];
-	MachineCodeWord newWord;
-	
-
-	/*Generate command machine code:*/
-	sprintf(command,"%s\t\t", DecimalNumberToBase32(rowNum));
-	//TODO:(AS): here we need to add the structure of the command
-	strcpy(buffer, FromDecimalToBinary(opcode, 4));
-	SetMachineCodeWord(&newWord, C_OPCODE, buffer);
-	
-	//(AS): fill the first valie of sasha project - opcode
-	sprintf(buffer,"%.2o",opcode);
-	strcat(command,buffer);
-	
-	switch(opcode)
-	{	/*op2 may come in op1*/
-		case NOT:
-		case CLR:
-		case DEC:
-		case INC:
-		case JMP:
-		case BNE:
-		case PRN:
-		case RED:
-		case JSR:
-					op2=op1;
-					op1 = NULL;
-					break;
-	}
-	
-	if (op1!=NULL && op1[0]!='\0')
-		op1AddressForm = getAddressForm(op1);
-	if (op2!=NULL && op2[0]!='\0')
-		op2AddressForm = getAddressForm(op2);
-
-	if (op1!=NULL && op1[0]!='\0')
-	{
-		strcpy(buffer, FromDecimalToBinary(op1AddressForm, 2));
-		SetMachineCodeWord(&newWord, C_ADDRESS_SRC, buffer);
-
-		//(AS): fill the second value of sasha project - adress form source
-		sprintf(buffer,"%o",op1AddressForm);
-		strcat(command,buffer);
-		if(op1AddressForm == DIRECTREG)
-		{
-			sprintf(buffer,"%o",op1[1]-'0'); /*op[1] is the register number (char), get it as int by substracting '0'*/
-			strcat(command,buffer);
-		}
-		else
-			strcat(command,"0"); /*register bits are not used in address form 0,1,3*/
-	}
-	else
-	{
-		strcpy(buffer, FromDecimalToBinary(0, 2));
-		SetMachineCodeWord(&newWord, C_ADDRESS_SRC, buffer);
-		strcat(command, "00"); /*operand is not used*/
-	}
-		
-	
-	/*do the same for op2*/
-
-	if (op2!=NULL && op2[0]!='\0')
-	{
-		sprintf(buffer,"%o",op2AddressForm);
-		strcat(command,buffer);
-		if(op2AddressForm == DIRECTREG)
-		{
-			sprintf(buffer,"%o",op2[1]-'0'); 
-			strcat(command,buffer);
-		}
-		else
-			strcat(command,"0");
-	}
-	else
-		strcat(command,"00");
-
-	strcat(command,"\t\ta\n"); /*command is always absolute*/
-	rowNum++;
-	
-	if(DEBUGMODE)
-		printf("first command row: \n%s",command);
-	
-	strcpy(op1word,"");
-	strcpy(op2word,"");
-
-	if (op1AddressForm != BADADDRESSFORM && op1AddressForm != DIRECTREG)
-		getOpWord(&op1word,op1,op1AddressForm,ext);
-
-	if (op2AddressForm != BADADDRESSFORM && op2AddressForm != DIRECTREG)
-		getOpWord(&op2word,op2,op2AddressForm,ext);
-
-	strcat(command,op1word);
-	strcat(command,op2word);
-	
-	if(DEBUGMODE)
-		printf("command: \n%s\n",command);
-		
-	strcpy(*dest,command);
 }
 
 int commandAddressFormIsLegal(char *op1, char *op2, int opcode)
@@ -462,9 +299,7 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 			removeSpaces(&buffer, temp, strlen(temp));
 			if (buffer[0] == '\0')
 			{
-				//sprintf(buffer, "%s\t\tError: Spaces alone are not allowed between commas!\n", DecimalNumberToBase32(dataRowNum));
-				fprintf(errorFile, "%d\t\tError: Tag \"%s\" is defined more than once in the source file!\n", dataRowNum, tag);
-				//addData(buffer);
+				fprintf(errorFile, "%s\t\tError: Spaces alone are not allowed between commas!\n", DecimalNumberToBase32(dataRowNum));
 			}
 			else
 			{
@@ -479,17 +314,15 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 				}
 				else
 				{
-					//TODO: (AS): handle it with errror handler
-					sprintf(buffer, "%s\t\tError: Only numbers are allowed between commas!\n", DecimalNumberToBase32(dataRowNum));
-					addData(buffer);
+					fprintf(errorFile, "%s\t\tError: Only numbers are allowed between commas!\n", DecimalNumberToBase32(dataRowNum));
 				}
 			}
+
 			dataRowNum++;
 			temp = strtok(NULL, ",");
 		}
 
 		return SUCCESS;
-
 		break;
 
 	case COMMAND:
@@ -504,8 +337,7 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 				return SUCCESS;
 			}
 		}
-		if (DEBUGMODE)
-			printf("tag is not duplicated\n");
+		
 		result = commandAddressFormIsLegal(op1, op2, opcode);
 		if (result == BADADDRESSFORM)
 		{
@@ -514,15 +346,14 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 			rowNum++;
 			return SUCCESS;
 		}
+		
 		else if (result == NULLOPERANDS)
 		{
 			fprintf(errorFile, "%s\t\tError: Wrong number of parameters in the command!\n", DecimalNumberToBase32(rowNum));
 			rowNum++;
 			return SUCCESS;
 		}
-		if (DEBUGMODE)
-			printf("address is ok\n");
-
+		
 		/*else: result == SUCCESS (address form is legal)*/
 		prevRowNum = rowNum;
 		machineCommand = ConvertCommand(op1, op2, opcode, ext, errorFile);
@@ -556,7 +387,7 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 		if (length<1) /*bad string (doesn't start or end with a " )*/
 		{
 			//TODO:(AS): change to error file handler
-			fprintf(fp, "%o\t\tError: String %s doesn't start or end with a \" !\n", rowNum, op1);
+			fprintf(errorFile, "%s\t\tError: String %s doesn't start or end with a \" !\n", DecimalNumberToBase32(rowNum), op1);
 			rowNum++;
 			return SUCCESS;
 		}
@@ -595,13 +426,13 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 		row = getRow(op1);
 		if (row == NULL) /*entry with no such tag*/
 		{
-			fprintf(fp, "Error: Tag \" %s \" is not defined in the source file!\n", op1);
+			fprintf(errorFile, "Error: Tag \" %s \" is not defined in the source file!\n", op1);
 			return SUCCESS;
 		}
 
 		/*assuming address is a non-negative number less than or equal to 2^16-1*/
 		if (hasADuplicate(row->tag))
-			fprintf(fp, "Error: %s is defined in more than once in the source file!\n", row->tag);
+			fprintf(errorFile, "Error: %s is defined in more than once in the source file!\n", row->tag);
 		else
 			fprintf(fp, "%s\t\t%s\n", row->tag, DecimalNumberToBase32(row->address));
 		return SUCCESS;
@@ -609,7 +440,7 @@ int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2,
 		break;
 
 	case ERROR:
-		fprintf(fp, "%s\t\tError: %s\n", DecimalNumberToBase32(rowNum), op1);
+		fprintf(errorFile, "%s\t\tError: %s\n", DecimalNumberToBase32(rowNum), op1);
 		rowNum++;
 		return SUCCESS;
 

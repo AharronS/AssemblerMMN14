@@ -47,9 +47,16 @@ void FromDecimalNumberToBase32(int num, char* outputBase32)
 char *DecimalNumberToBase32(int num)
 {
 	int length;
-	char outputBase32[MAX_SIZE_MEMORY_WORDS] = "";
+	char tempBuff[4] = { '\0' }, outputBase32[MAX_SIZE_MEMORY_WORDS] = "";
 	SubRoutineFromDecimalNumberToBase32(num, outputBase32);
-	
+	//(AS): if we want to add padding to the base 32 number, uncomment these lines
+	//length = strlen(outputBase32);
+	//if (length < 3)
+	//{
+	//	memset(tempBuff, '0', 3);
+	//	strcpy(tempBuff + (3 - length), outputBase32);
+	//	strcpy(outputBase32, tempBuff);
+	//}
 	return outputBase32;
 }
 

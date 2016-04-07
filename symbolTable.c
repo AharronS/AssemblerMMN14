@@ -7,40 +7,6 @@
 
 static symbolTable *symbolPtr;
 
-void printTable() /*FOR DEBUGMODE ONLY*/
-{
-	int i;
-	for (i=0;i<symbolPtr->currentSymbol;i++)
-	{
-		printf("Symbol: %s\t",symbolPtr->row[i].tag);
-		printf("Address: %d\t",symbolPtr->row[i].address); /*DECIMAL (not octal) NUMBER*/ 
-		printf("Command length: %d\t",symbolPtr->row[i].commandLength);
-		
-		if (symbolPtr->row[i].isTemp == YES)
-			printf("isTemp: yes\t");
-		if (symbolPtr->row[i].isTemp == NO)
-			printf("isTemp: no\t");
-		
-		if (symbolPtr->row[i].isExtern == YES)
-
-			printf("isExternal: yes\t");
-		if (symbolPtr->row[i].isExtern == NO)
-			printf("isExternal: no\t");
-		
-		if (symbolPtr->row[i].associatedTo == DATA)
-			printf("assoc.: data\t");
-		if (symbolPtr->row[i].associatedTo == COMMAND)
-			printf("assoc.: command\t");
-		if (symbolPtr->row[i].associatedTo == EXTERN)
-			printf("assoc.: external\t");
-		
-		printf("\n");
-	}
-	printf("Current free symbol: %d\n",symbolPtr->currentSymbol);
-}
-
-
-
 void deleteTable()
 {
 	free(symbolPtr);
@@ -94,12 +60,6 @@ void init()
 	/*initialize duplicatedTags array:*/
 	for (i=0;i<MAXSYMBOLS;i++)
 		strcpy(duplicatedTags[i],EMPTYTAG);
-	
-	if (DEBUGMODE)
-	{
-		printf("Symbol table after calling init():\n");
-		printTable();
-	}
 }
 
 int addSymbol (char symbol[], int lineType, int counterVal) /*called to update symbol table*/
@@ -107,12 +67,6 @@ int addSymbol (char symbol[], int lineType, int counterVal) /*called to update s
 	
 	int i, currentSymb = symbolPtr->currentSymbol;
 	int updateVal;
-
-	if (DEBUGMODE)
-	{
-		printf("Symbol table before addSymbol():\n");
-			printTable();
-	}
 
 	if (symbol != NULL && symbol[0]!='\0')
 	{
@@ -184,12 +138,6 @@ int addSymbol (char symbol[], int lineType, int counterVal) /*called to update s
 		symbolPtr->row[symbolPtr->currentSymbol] = new;
 		(symbolPtr->currentSymbol)++;
 	}
-	
-	if (DEBUGMODE)
-	{
-		printf("Symbol table after addSymbol():\n");
-		printTable();
-	}
 	return SUCCESS;
 }
 
@@ -253,7 +201,7 @@ int update(int icVal, int dcVal,FILE *obj)	/*when first pass finished, we need t
 	}
 	//TODO:(AS): here we need to change the header in file.
 	fputs("Base 32 Address\t\tBase 32 machine code\n\n",obj);
-	fprintf(obj, "\t\t%s", DecimalNumberToBase32((icVal - COUNTERSTARTLINE)));
+	fprintf(obj, "\t%s", DecimalNumberToBase32((icVal - COUNTERSTARTLINE)));
 	fprintf(obj, "\t%s\n", DecimalNumberToBase32(dcVal));
 	return SUCCESS;
 }

@@ -188,14 +188,6 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 		case CLR:
 		case DEC:
 		case RED:
-					
-					/*op1 should be NULL (see table on specs. page 31)*/
-					if (DEBUGMODE && (op2 != NULL || *op2 != '\0'))
-					{
-						printf("ERROR!!\n*********************\n");
-						printf("checkCommandAddressForm reports op1 is not NULL!\n");
-						printf("op1 = %s\t op2 = %s\n",op1,op2);
-					}
 					if (op1==NULL || *op1=='\0')
 						return NULLOPERANDS;
 					op1address = getAddressForm(op1);
@@ -209,12 +201,6 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 		case JMP:
 		case BNE:
 		case JSR:
-					if (DEBUGMODE && (op2 != NULL || *op2 != '\0'))
-					{
-						printf("ERROR!!\n*********************\n");
-						printf("checkCommandAddressForm (JMP\\BNE\\JSR) reports op1 is not NULL!\n");
-						printf("op1 = %s\t op2 = %s\n",op1,op2);
-					}
 					if (op1==NULL || *op1=='\0')
 						return NULLOPERANDS;
 					
@@ -229,12 +215,6 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 					break;
 
 		case PRN:
-					if (DEBUGMODE && (op2 != NULL || *op2 != '\0'))
-					{
-						printf("ERROR!!\n*********************\n");
-						printf("checkCommandAddressForm (PRN) reports op1 is not NULL!\n");
-						printf("op1 = %s\t op2 = %s\n",op1,op2);
-					}
 					if (op1==NULL || *op1=='\0')
 						return NULLOPERANDS;
 					
@@ -248,13 +228,6 @@ int checkCommandAddressForm(char *op1, char *op2, int opcode)
 
 		case RTS:
 		case STOP:
-					if (DEBUGMODE && (op1 != NULL || *op1 != '\0') && (op2 != NULL || *op2 != '\0'))
-					{
-						printf("ERROR!!\n*********************\n");
-						printf("checkCommandAddressForm (RTS\\HLT) reports op1 or op2 is not NULL!\n");
-						printf("op1 = %s\t op2 = %s\n",op1,op2);
-					}
-					
 					break;
 	}
 	return lines;

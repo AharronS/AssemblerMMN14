@@ -79,7 +79,6 @@ void setRowNum(int);
 void setDataRowNum(int);
 void removeSpaces(char(*res)[], char* stringIn, int stringLength);
 void getOpWord(char (*dest)[],char op[], int opAddressForm, FILE *ext);
-void getCommand(char (*dest)[],char *op1, char *op2, int opcode, FILE *ext);
 int commandAddressFormIsLegal(char *op1, char *op2, int opcode);
 int secondPass(char *tag, int instructionType, int opcode, char *op1, char *op2, FILE *fp, FILE *ext, FILE *errorFile);
 void WriteToFileCommandMachineWord(commandMachineCodeWord *wordCommand, FILE *fp, int rowNum);
@@ -102,6 +101,7 @@ void TagChecker(char* partstr,char (*strret)[]);
 int InstructionChecker(char* instr,char* op1, char* op2,char (*retstr)[]);
 void OperandNumChecker(int NumExpectedOperand,char* op1, char* op2,char (*retstr)[]);
 int CompilerInstrChecker(char* instr);
+void printFile(FILE *file);
 
 /*in dataSegment:*/
 void newDataSegment();

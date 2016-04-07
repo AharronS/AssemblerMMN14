@@ -47,9 +47,6 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if(DEBUGMODE) printf("input file1 name: %s\n",argv[1]);
-
-
 	for (fileIndex = 1; fileIndex < argc; fileIndex++)	/*for each file in argv, do:*/
 	{
 		entries   = NULL;
@@ -68,7 +65,7 @@ int main(int argc, char *argv[])
 		strcpy(fileNameTemp,fileName);
 		strcat(fileNameTemp,".as");
 		if((src = fopen(fileNameTemp, "r"))==NULL) {
-		   printf("Error: Cannot open file %s.\n",fileNameTemp);
+		   printf("Error: Cannot open file %s.\n", fileNameTemp);
 		   exit(1);
 		}
 		
@@ -94,8 +91,6 @@ int main(int argc, char *argv[])
 		while(!feof(src)) {
 			if(fgets(str, MAXLINELENGTH-3, src))	/*read strings*/
 			{
-				if(FINALDEBUGMODE)printf("file reading sends:%s\n",str);
-
 				if(strlen(str)>=(MAXLINELENGTH-4) || ExceededLineLengthFlag==TRUE)
 				{
 
@@ -770,7 +765,23 @@ void OperandNumChecker(int numExpectedOperand,char* op1, char* op2,char (*retstr
 	strcpy(*retstr,"legal");
 }
 
+void printFile(FILE *file)
+{
+	#define CHUNK 1024 /* read 1024 bytes at a time */
+	char buf[CHUNK];
+	size_t nread;
 
+	if (file) {
+		while ((nread = fread(buf, 1, sizeof buf, file)) > 0)
+			fwrite(buf, 1, nread, stdout);
+		if (ferror(file)) {
+			printf("couldn't read file, exiting..");
+			exit(1);
+		}
+		fclose(file);
+	}
+}
+	
 
 
 
