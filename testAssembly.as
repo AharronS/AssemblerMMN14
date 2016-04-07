@@ -1,6 +1,10 @@
 .entry LOOP
 MAIN: inc K
 mov *, W
+
+
+
+
 .extern W
 	add r2, STR
 LOOP: jmp W

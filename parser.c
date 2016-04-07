@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 
 	char tag[MAXTAGLENGTH], op1[MAXLINELENGTH], op2[MAXLINELENGTH]; /*return values for the command */
 	int instropcode[1];
+	int reomveRet, finalRetStatus;						//(AS): holds the return type from deleting file function 
 	int interCompilerCommand; 		/*holds the type of command passed to firstpass()*/
 	char str[MAXLINELENGTH]; 		/*buffer for line reading*/
 	int ExceededLineLengthFlag;		/*flag indicating if last line exceeded the max length permitted*/
@@ -79,8 +80,8 @@ int main(int argc, char *argv[])
 		}
 
 
-		errorFile = fopen("ErrorTempFile", "w");
-		if (!object) {
+		errorFile = fopen("ErrorFile.txt", "r+");
+		if (!errorFile) {
 			printf("Cannot open critical debug file!\n");
 			exit(1);
 		}
@@ -225,12 +226,38 @@ int main(int argc, char *argv[])
 			deleteDataSegment();
 		}
 
-		if(object!=NULL)
+		if (object != NULL)
 			fclose(object);
-		if(entries!=NULL)
+		if (entries != NULL)
 			fclose(entries);
-		if(externals!=NULL)
+		if (externals != NULL)
 			fclose(externals);
+
+		//(AS): Check whether the  errors file contains information. If there are errors - delete all files, and prints all errors
+		if (ftell(errorFile) != 0) //(AS): check if file isn't empty
+		{
+			strcpy(fileNameTemp, fileName);
+			strcat(fileNameTemp, ".ext");
+			reomveRet = remove(fileNameTemp);
+			finalRetStatus = (reomveRet == 0) ? 1 : 0;
+			strcpy(fileNameTemp, fileName);
+			strcat(fileNameTemp, ".ob");
+			reomveRet = remove(fileNameTemp);
+			finalRetStatus = (reomveRet == 0) ? 1 : 0;
+			strcpy(fileNameTemp, fileName);
+			strcat(fileNameTemp, ".ent");
+			reomveRet = remove(fileNameTemp);
+			finalRetStatus = (reomveRet == 0) ? 1 : 0;
+			
+			if (finalRetStatus == 0)
+			{
+				printf("Error! Failed deleting essential files\n");
+				exit(1);
+			}
+			rewind(errorFile);
+			printFile(errorFile);
+		}
+
 		if (errorFile != NULL)
 			fclose(errorFile);
 		
@@ -767,19 +794,10 @@ void OperandNumChecker(int numExpectedOperand,char* op1, char* op2,char (*retstr
 
 void printFile(FILE *file)
 {
-	#define CHUNK 1024 /* read 1024 bytes at a time */
-	char buf[CHUNK];
-	size_t nread;
-
-	if (file) {
-		while ((nread = fread(buf, 1, sizeof buf, file)) > 0)
-			fwrite(buf, 1, nread, stdout);
-		if (ferror(file)) {
-			printf("couldn't read file, exiting..");
-			exit(1);
-		}
-		fclose(file);
-	}
+	char   buffer[4096];
+	size_t nbytes;
+	while ((nbytes = fread(buffer, sizeof(char), sizeof(buffer), file)) != 0)
+		fwrite(buffer, sizeof(char), nbytes, stdout);
 }
 	
 
