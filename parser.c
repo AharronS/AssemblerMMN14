@@ -207,12 +207,12 @@ int main(int argc, char *argv[])
 				else
 				{
 
-					interCompilerCommand=parser(str,&tag,&instropcode,&op1,&op2);
+					interCompilerCommand = parser(str,&tag,&instropcode,&op1,&op2);
 					
 					if (interCompilerCommand == ENTRY)
-						secondPass(tag,ENTRY,-1,op1,op2,entries,externals, errorFile);
+						secondPass(tag, ENTRY, -1, op1, op2, entries, externals, errorFile);
 					else
-						secondPass(tag,interCompilerCommand,instropcode[0],op1,op2,object,externals, errorFile);
+						secondPass(tag, interCompilerCommand, instropcode[0], op1, op2, object, externals, errorFile);
 				}
 
 				instropcode[0]=ILLEGAL; /*clean up for next round */

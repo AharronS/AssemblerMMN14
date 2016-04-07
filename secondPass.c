@@ -162,7 +162,8 @@ commandMachineCodeWord ConvertCommand(char *op1, char *op2, int opcode, FILE *ex
 		strcpy(buffer, FromDecimalToBinary(getAddressForm(op1), 2));
 		SetMachineCodeWord(&(newWordcommand.lines[0]), C_ADDRESS_DST, buffer);
 		AddAnotherMachineCodeWord(&newWordcommand);
-		FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum);
+		//(AS): Because we added a line, we have to add to rowNum +1. Note we do not update the value of the rowNum
+		FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum + 1);
 		rowNum++;
 		break;
 	case 2:
@@ -175,17 +176,20 @@ commandMachineCodeWord ConvertCommand(char *op1, char *op2, int opcode, FILE *ex
 		if (!(getAddressForm(op1) == DIRECTREG && getAddressForm(op2) == DIRECTREG)) 
 		{
 			AddAnotherMachineCodeWord(&newWordcommand);
-			FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum);
+			//(AS): Because we added a line, we have to add to rowNum +1. Note we do not update the value of the rowNum
+			FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum + 1);
 			AddAnotherMachineCodeWord(&newWordcommand);
-			FillAnotherMachineCodeWord(&newWordcommand, op2, GetGroupCode(opcode), ext, errorFile, rowNum);
+			//(AS): Because we added a line, we have to add to rowNum +2. Note we do not update the value of the rowNum
+			FillAnotherMachineCodeWord(&newWordcommand, op2, GetGroupCode(opcode), ext, errorFile, rowNum + 2);
 			rowNum += 2;
 		}
 		//(AS): Add one machine code word if and only if both operands are direct registers 
 		else
 		{
 			AddAnotherMachineCodeWord(&newWordcommand);
-			FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum);
-			FillAnotherMachineCodeWord(&newWordcommand, op2, GetGroupCode(opcode), ext, errorFile, rowNum);
+			//(AS): Because we added a line, we have to add to rowNum +1. Note we do not update the value of the rowNum
+			FillAnotherMachineCodeWord(&newWordcommand, op1, GetGroupCode(opcode), ext, errorFile, rowNum + 1);
+			FillAnotherMachineCodeWord(&newWordcommand, op2, GetGroupCode(opcode), ext, errorFile, rowNum + 1);
 			rowNum ++;
 		}
 		break;
